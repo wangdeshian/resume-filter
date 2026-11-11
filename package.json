@@ -1,0 +1,1 @@
+{"name":"resume-filter","private":true,"type":"module","scripts":{"build":"node scripts/sync-data.mjs","check":"node --check site/app.js && node --check scripts/source.mjs && node --check scripts/sync-data.mjs"},"engines":{"node":">=22"}}

@@ -31,11 +31,16 @@ export function parseReligion(html){
  const items=[...left.matchAll(/<li>\s*<div>([\s\S]*?)<\/div>\s*<\/li>/gi)].map(m=>text(m[1]));
  return items.length===4&&/cm\s*\/.*kg/.test(items[1])?items[3]||'來源未記載':'來源未記載或格式已變更';
 }
-export async function getReligion(id){
+export function parseCareExperience(html){
+ const sections=html.split(/<div\s+class\s*=\s*["']lists2["'][^>]*>/i).filter(s=>/其他資訊|家庭成員/.test(s)===false&&/工作經驗|備註/.test(s));
+ return sections.map(s=>text(s.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<!--[^]*?-->/g,''))).join('\n').replace(/線上履歷由AI[\s\S]*$/,'').replace(/\.{4}/g,'').trim();
+}
+export async function getDetails(id){
  if(!/^[a-f0-9]{32}$/.test(id||''))throw Error('履歷編號無效');
  const u=new URL(SOURCE);u.searchParams.set('fun','showresume');u.searchParams.set('id',id);u.searchParams.set('of','resume');
  const r=await fetch(u,{signal:AbortSignal.timeout(20000),redirect:'error'});if(!r.ok)throw Error('原始履歷暫時無法讀取');
- return {religion:parseReligion(await r.text()),source:u.href};
+ const html=await r.text();
+ return {religion:parseReligion(html),careText:parseCareExperience(html),source:u.href};
 }
 export async function getSource(){
  if(cached&&Date.now()-cached.at<60000)return cached.data;

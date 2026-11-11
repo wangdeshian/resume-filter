@@ -30,6 +30,7 @@ jobs:
           key: source-cache-${{ github.run_id }}
           restore-keys: source-cache-
       - run: npm run check
+      - run: npm test
       - name: Fetch public source records
         run: npm run build
       - uses: actions/configure-pages@v5

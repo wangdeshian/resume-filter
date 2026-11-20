@@ -3,6 +3,22 @@ import assert from 'node:assert/strict';
 import '../site/care-search.js';
 import {parseCareExperience} from './source.mjs';
 const care=globalThis.CareSearch;
+test('housekeeping and childcare can be required together with source evidence',()=>{
+ const text='工作經驗：做家務事、洗衫、燙衫、煮飯，照顧 2歲及7歲 小孩並接送上學。';
+ assert.equal(care.matches(text,['幫傭／家務','照顧小孩','煮飯備餐'],''),true);
+ assert.equal(care.matches('工作經驗：打掃、洗衣、煮飯。',['幫傭／家務','照顧小孩'],''),false);
+ assert.match(care.snippets(text,['照顧小孩'],'').join(' '),/照顧 2歲及7歲 小孩/);
+});
+test('having children and caring for adults do not establish childcare experience',()=>{
+ assert.equal(care.matches('本人有兩個孩子。工作經驗：照顧老人，清潔房間。',['照顧小孩'],''),false);
+ assert.equal(care.matches('照顧阿嬤80歲，協助洗澡。',['嬰幼兒照顧'],''),false);
+ assert.equal(care.matches('給長者餵食，不需煮飯。',['嬰幼兒照顧'],''),false);
+});
+test('infant care and common foreign-language work descriptions are searchable',()=>{
+ assert.equal(care.matches('照顧3個月大的嬰兒，泡奶、換尿布。',['照顧小孩','嬰幼兒照顧'],''),true);
+ assert.equal(care.matches('Housekeeping, cooking and caring for two children.',['幫傭／家務','煮飯備餐','照顧小孩'],''),true);
+ assert.equal(care.matches('Menjaga bayi dan memasak, membersihkan rumah.',['嬰幼兒照顧','煮飯備餐','幫傭／家務'],''),true);
+});
 test('multiple care requirements use AND by default and support explicit OR',()=>{
  assert.equal(care.matches('協助翻身，照顧臥床長者',['翻身','臥床'],''),true);
  assert.equal(care.matches('只有翻身記載',['翻身','臥床'],''),false);

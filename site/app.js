@@ -40,7 +40,7 @@ async function showReligion(url){
 function renderCareButtons(){
  const box=$('carePresets');box.replaceChildren();
  for(const label of Object.keys(CareSearch.presets)){const b=document.createElement('button');b.type='button';b.textContent=label;b.className=careSelected.has(label)?'care-tag selected':'care-tag';b.setAttribute('aria-pressed',String(careSelected.has(label)));b.onclick=()=>{careSelected.has(label)?careSelected.delete(label):careSelected.add(label);page=1;renderCareButtons();render()};box.append(b)}
- $('careSummary').textContent=careSelected.size||careQuery?'依照護原文篩選中；可與年齡、經驗等條件交叉使用。':'選擇常用關鍵字，或輸入其他照護需求。';
+ $('careSummary').textContent=careSelected.size||careQuery?'依工作原文篩選中；可與年齡、經驗等條件交叉使用。':'可找照護、家務及照顧小孩的工作記載。';
 }
 function showCare(url){
  const row=rows.find(r=>r['原始履歷']===url);if(!row)return;
